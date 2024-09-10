@@ -1,40 +1,84 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Real Estate Tokenization Platform
+This project is a decentralized platform for tokenizing real estate properties on the Cardano blockchain. It enables fractional ownership of real estate assets by representing them as Cardano native tokens. The platform leverages Plutus smart contracts for secure token minting and trading, while users can interact with the system through a web-based frontend built with React.
+
+## Features
+
+Tokenization of Real Estate: Convert real estate properties into tradable Cardano native tokens.
+Fractional Ownership: Allows multiple users to own fractions of a property through tokens.
+Secure Transactions: Utilizes Plutus smart contracts for secure token minting and transfer.
+Wallet Integration: Connect to Cardano wallets (e.g., Nami) for seamless interaction.
+Plutus and Cardano Integration: Leverages Plutus for on-chain logic and @emurgo/cardano-serialization-lib-browser for off-chain transactions.
+
+## Tech Stack
+Frontend: React, TypeScript
+Smart Contracts: Plutus (Haskell)
+Blockchain: Cardano
+Libraries:
+```
+@emurgo/cardano-serialization-lib-browser
+```
+Plutus tools
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+Node.js (v14 or higher)
+npm or yarn
+A Cardano wallet (e.g., yoroi)
+Plutus development environment (for compiling and deploying smart contracts)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+### Setting up Plutus Smart Contracts:
+
+Navigate to your Plutus directory and compile the Haskell/Plutus smart contracts. Ensure the contract is deployed on the Cardano blockchain. Once deployed, obtain the contract's address to interact with it in the frontend.
+
+### Connecting to a Wallet
+To interact with the Cardano blockchain, you’ll need to connect a wallet like yoroi:
+
+Click the "Connect Wallet" button.
+Approve the connection in your wallet extension.
+Once connected, you can view your wallet's address and initiate transactions.
+
+### Minting Property Tokens
+After connecting your wallet, click the "Mint Property Token" button.
+This will create a transaction that mints a native token representing ownership of a real estate property.
+
+### Smart Contracts
+The Plutus smart contract handles the tokenization of real estate properties. It is written in Haskell and deployed on the Cardano blockchain. The key components are:
+
+Property Data Type: Represents a real estate property with an ID, owner, and value.
+Minting Policy: Enforces the minting rules for the property tokens.
+
+```
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+
+module RealEstate where
+
+import PlutusTx.Prelude
+import Plutus.Contract
+import Ledger
+import Ledger.Constraints as Constraints
+import PlutusTx
+import Prelude (String)
+
+data Property = Property
+  { propertyId :: Integer
+  , owner :: PubKeyHash
+  , value :: Integer
+  }
+
+mkToken :: Property -> Contract w s Text ()
+mkToken property = do
+    let tokenName = "PropertyToken-" <> (show $ propertyId property)
+        mintingPolicy = Constraints.mustMintValue $ Value.singleton "" tokenName 1
+        ownerAddress = Ledger.pubKeyHashAddress $ owner property
+    submitTxConstraintsWith @Void mintingPolicy Constraints.empty
+    logInfo @String $ "Minted token for property: " <> tokenName
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
-
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
-
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
-
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+### Future Improvements
+Property Marketplace: Add a marketplace where users can buy, sell, and trade property tokens.
+Fractional Ownership Trading: Allow users to trade fractions of ownership in real-time.
+DeFi Integration: Integrate decentralized finance (DeFi) options like collateralizing property tokens.

@@ -16,6 +16,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "contracts/RealEstate.hs", "contracts/MintingPolicy.hs"],
   "exclude": ["node_modules"]
 }
