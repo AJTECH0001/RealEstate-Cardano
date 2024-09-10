@@ -23,8 +23,11 @@ Plutus tools
 
 ### Prerequisites
 Node.js (v14 or higher)
+
 npm or yarn
+
 A Cardano wallet (e.g., yoroi)
+
 Plutus development environment (for compiling and deploying smart contracts)
 
 ### Setting up Plutus Smart Contracts:
